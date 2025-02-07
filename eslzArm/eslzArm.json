@@ -14,6 +14,15 @@
             "defaultValue": "",
             "maxLength": 36
         },
+        "enablePrivateSubnet": {
+            "type": "string",
+            "defaultValue": "Audit",
+            "allowedValues": [
+                "Audit",
+                "Deny",
+                "Disabled"
+            ]
+        },
         "telemetryOptOut": {
             "type": "string",
             "defaultValue": "No",
@@ -36,9 +45,21 @@
                 "description": "If 'Yes' is selected when also adding a subscription for management, ARM will assign two policies to enable auditing in your environment, into the Log Analytics workspace for platform monitoring. If 'No', it will be ignored."
             }
         },
+        "laCategory": {
+            "type": "string",
+            "defaultValue": "allLogs",
+            "allowedValues": [
+                "allLogs",
+                "auditLogs"
+            ]
+        },
         "retentionInDays": {
             "type": "string",
             "defaultValue": ""
+        },
+        "enableSentinel": {
+            "type": "string",
+            "defaultValue": "Yes"
         },
         "managementSubscriptionId": {
             "type": "string",
@@ -211,6 +232,13 @@
                 "No"
             ]
         },
+        "enableServiceHealth": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "If 'Yes' is selected, ARM will assign a policy initiative to deploy alerting for Service Health in your environment. If 'No', it will be ignored."
+            }
+        },
         "enableMonitorBaselines": {
             "type": "string",
             "defaultValue": "",
@@ -243,14 +271,6 @@
                 "description": "If 'Yes' is selected, ARM will assign a policy initiative to deploy alerting for select management resources in your environment. If 'No', it will be ignored."
             }
         },
-        "enableMonitorLandingZones": {
-            "type": "string",
-            "defaultValue": "",
-            "maxLength": 36,
-            "metadata": {
-                "description": "If 'Yes' is selected, ARM will assign a policy initiative to deploy alerting for select resources in your environment. If 'No', it will be ignored."
-            }
-        },
         "monitorAlertsResourceGroup": {
             "type": "string",
             "defaultValue": "",
@@ -259,12 +279,89 @@
                 "description": "Name of the resource group to be created for monitoring resources in each subscription."
             }
         },
-        "emailContactActionGroup": {
+        "userAssignedManagedIdentityName": {
             "type": "string",
             "defaultValue": "",
-            "maxLength": 36,
+            "maxLength": 90,
+            "metadata": {
+                "description": "The name of the user assigned managed identity for monitoring purpose."
+            }
+        },
+        "ambaAgEmailContact": {
+            "type": "string",
+            "defaultValue": "",
             "metadata": {
                 "description": "Email address for alerting purposes."
+            }
+        },
+        "ambaAgServiceHook": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Service Hook URI for action group notifications."
+            }
+        },
+        "ambaAgArmRole": {
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "ARM roles for action group notifications."
+            }
+        },
+        "enableAMBAHybridVM": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "Assign HybridVM initiative"
+            }
+        },
+        "enableAMBAKeyManagement": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "Assign Key Management initiative"
+            }
+        },
+        "enableAMBALoadBalancing": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "Assign Load Balancing initiative"
+            }
+        },
+        "enableAMBANetworkChanges": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "Assign Network Changes initiative"
+            }
+        },
+        "enableAMBARecoveryServices": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "Assign Recovery Services initiative"
+            }
+        },
+        "enableAMBAStorage": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "Assign Storage initiative"
+            }
+        },
+        "enableAMBAVM": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "Assign VM initiative"
+            }
+        },
+        "enableAMBAWeb": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "metadata": {
+                "description": "Assign Web initiative"
             }
         },
         "connectivitySubscriptionId": {
@@ -282,6 +379,10 @@
         "connectivityLocation": {
             "type": "string",
             "defaultValue": "[deployment().location]"
+        },
+        "deployAVNM": {
+            "type": "bool",
+            "defaultValue": false
         },
         "enableDdoS": {
             "type": "string",
@@ -771,15 +872,6 @@
                 "description": "If 'Yes' is selected, policy will be assigned to enforce Hybrid VM monitoring."
             }
         },
-        "enableAksPolicy": {
-            "type": "string",
-            "defaultValue": "No",
-            "allowedValues": [
-                "Yes",
-                "Audit",
-                "No"
-            ]
-        },
         "denyAksPrivileged": {
             "type": "string",
             "defaultValue": "No",
@@ -987,7 +1079,7 @@
         },
         "delayCount": {
             "type": "int",
-            "defaultValue": 45,
+            "defaultValue": 55,
             "minValue": 1,
             "maxValue": 60,
             "metadata": {
@@ -1005,6 +1097,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1020,6 +1113,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1035,6 +1129,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1050,6 +1145,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1061,10 +1157,27 @@
                 "description": "Array of management groups to assign the Workload Specific Compliance initiative for Automation Accounts."
             }
         },
+        "enableWsBotServiceInitiatives": {
+            "type": "string",
+            "allowedValues": [
+                "Yes",
+                "Audit",
+                "No"
+            ],
+            "defaultValue": "No"
+        },
+        "wsBotServiceSelectorMG": {
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "Array of management groups to assign the Workload Specific Compliance initiative for Automation Accounts."
+            }
+        },
         "enableWsCognitiveServicesInitiatives": {
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1080,6 +1193,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1095,6 +1209,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1110,6 +1225,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1125,6 +1241,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1140,6 +1257,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1155,6 +1273,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1170,6 +1289,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1185,6 +1305,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1200,6 +1321,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1215,6 +1337,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1230,6 +1353,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1245,6 +1369,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1260,6 +1385,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1275,6 +1401,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1290,6 +1417,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1305,6 +1433,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1320,6 +1449,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1335,6 +1465,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1350,6 +1481,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1365,6 +1497,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1380,6 +1513,7 @@
             "type": "string",
             "allowedValues": [
                 "Yes",
+                "Audit",
                 "No"
             ],
             "defaultValue": "No"
@@ -1395,7 +1529,7 @@
             "type": "array",
             "defaultValue": [],
             "metadata": {
-                "description": "Array of objects containing built-in Regulatory Compliance policies to assign to sepcfied Management Groups"
+                "description": "Array of objects containing built-in Regulatory Compliance policies to assign to specified Management Groups"
             }
         },
         "regCompPolParAusGovIsmRestrictedVmAdminsExclude": {
@@ -1572,7 +1706,7 @@
         },
         // Declaring root uris for external dependency repositories.
         "rootUris": {
-            "monitorRepo": "https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts/2023-11-14/"
+            "monitorRepo": "https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts/2025-02-05/"
         },
         // Declaring all required deployment uri's used for deployments of composite ARM templates for ESLZ
         "azPrivateDnsPolicyAssignmentMapping": {
@@ -1586,6 +1720,9 @@
             "roleDefinitions": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/roleDefinitions/customRoleDefinitions.json')]",
             "policyDefinitions": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyDefinitions/policies.json')]",
             "initiativeDefinitions": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyDefinitions/initiatives.json')]",
+            "preRequisites": "[uri(deployment().properties.templateLink.uri, 'prerequisites/deployPrerequisites.json')]",
+            "avnmConnectivityHub": "[uri(deployment().properties.templateLink.uri, 'subscriptionTemplates/avnmConfiguration.json')]",
+            "avnmPolicy": "[uri(deployment().properties.templateLink.uri, 'subscriptionTemplates/avnmPolicy.json')]",
             "vnetConnectivityHub": "[uri(deployment().properties.templateLink.uri, 'subscriptionTemplates/hubspoke-connectivity.json')]",
             "vwanConnectivityHub": "[uri(deployment().properties.templateLink.uri, 'subscriptionTemplates/vwan-connectivity.json')]",
             "nvaConnectivityHub": "[uri(deployment().properties.templateLink.uri, 'subscriptionTemplates/nvahubspoke-connectivity.json')]",
@@ -1596,7 +1733,6 @@
             "resourceGroup": "[uri(deployment().properties.templateLink.uri, 'subscriptionTemplates/resourceGroup.json')]",
             "ddosProtection": "[uri(deployment().properties.templateLink.uri, 'resourceGroupTemplates/ddosProtection.json')]",
             "logAnalyticsPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DINE-LogAnalyticsPolicyAssignment.json')]",
-            "monitoringSolutions": "[uri(deployment().properties.templateLink.uri, 'subscriptionTemplates/logAnalyticsSolutions.json')]",
             "asbPolicyInitiative": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DINE-ASBPolicyAssignment.json')]",
             "regulatoryComplianceInitaitves": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-RegulatoryCompliancePolicyAssignment.json')]",
             "resourceDiagnosticsInitiative": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DINE-ResourceDiagnosticsPolicyAssignment.json')]",
@@ -1610,7 +1746,6 @@
             "azVmssMonitorPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DINE-VMSSMonitoringPolicyAssignment.json')]",
             "azVmHybridMonitorPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DINE-VMHybridMonitoringPolicyAssignment.json')]",
             "azVmBackupPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DINE-VMBackupPolicyAssignment.json')]",
-            "azPolicyForAksPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DINE-AksPolicyPolicyAssignment.json')]",
             "aksPrivEscalationPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DENY-AksPrivEscalationPolicyAssignment.json')]",
             "aksPrivilegedPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DENY-AksPrivilegedPolicyAssignment.json')]",
             "tlsSslPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DENY-DINE-APPEND-TLS-SSL-PolicyAssignment.json')]",
@@ -1649,6 +1784,7 @@
             "resourceRgLocationPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/AUDIT-ResourceRGLocationPolicyAssignment.json')]",
             "VMUnmanagedDiskPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/DENY-VMUnmanagedDiskPolicyAssignment.json')]",
             "diagnosticSettingsforManagementGroups": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/diagSettingsMGs/diagSettingsMGs.json')]",
+            "privateSubnetPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-SubnetPrivatePolicyAssignment.json')]",
             // references to https://github.com/Azure/azure-monitor-baseline-alerts
             "monitorPolicyDefinitions": "[uri(variables('rootUris').monitorRepo, 'patterns/alz/alzArm.json')]",
             "azureUpdateManagerPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/MODIFY-AUM-CheckUpdatesPolicyAssignment.json')]",
@@ -1664,6 +1800,7 @@
             "wsAPIMPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-GuardrailsAPIMPolicyAssignment.json')]",
             "wsAppServicesPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-GuardrailsAppServicesPolicyAssignment.json')]",
             "wsAutomationPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-GuardrailsAutomationPolicyAssignment.json')]",
+            "wsBotServicePolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-GuardrailsBotServicePolicyAssignment.json')]",
             "wsCognitiveServicesPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-GuardrailsCognitiveServicesPolicyAssignment.json')]",
             "wsComputePolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-GuardrailsComputePolicyAssignment.json')]",
             "wsContainerAppsPolicyAssignment": "[uri(deployment().properties.templateLink.uri, 'managementGroupTemplates/policyAssignments/ENFORCE-GuardrailsContainerAppsPolicyAssignment.json')]",
@@ -1714,7 +1851,6 @@
             "monitorManagementDeploymentName": "[take(concat('alz-ManagementMonitor', variables('deploymentSuffix')), 64)]",
             "monitorLandingZoneDeploymentName": "[take(concat('alz-LandingZoneMonitor', variables('deploymentSuffix')), 64)]",
             "monitorServiceHealthDeploymentName": "[take(concat('alz-SvcHealthMonitor', variables('deploymentSuffix')), 64)]",
-            "monitoringSolutionsDeploymentName": "[take(concat('alz-Solutions', variables('deploymentSuffix')), 64)]",
             "asbPolicyDeploymentName": "[take(concat('alz-ASB', variables('deploymentSuffix')), 64)]",
             "regulatoryComplianceInitativesToAssignDeploymentName": "[take(concat('alz-RegComp-', deployment().location, '-', uniqueString(parameters('currentDateTimeUtcNow')), '-'), 64)]",
             "resourceDiagnosticsPolicyDeploymentName": "[take(concat('alz-ResourceDiagnostics', variables('deploymentSuffix')), 64)]",
@@ -1723,6 +1859,8 @@
             "atpOssDbPolicyDeploymentName": "[take(concat('alz-AtpOssDb', variables('deploymentSuffix')), 64)]",
             "atpSqlDbPolicyDeploymentName": "[take(concat('alz-AtpSqlDb', variables('deploymentSuffix')), 64)]",
             "ascGovPolicyDeploymentName": "[take(concat('alz-Gov-ASC', variables('deploymentSuffix')), 64)]",
+            "avnmConnectivityHubDeploymentName": "[take(concat('alz-AVNM', variables('deploymentSuffix')), 64)]",
+            "avnmPolicyDeploymentName": "[take(concat('alz-AVNMPolicy', variables('deploymentSuffix')), 64)]",
             "vnetConnectivityHubDeploymentName": "[take(concat('alz-HubSpoke', variables('deploymentSuffix')), 64)]",
             "vwanConnectivityHubDeploymentName": "[take(concat('alz-VWanHub', variables('deploymentSuffix')), 64)]",
             "vnetConnectivityHub2DeploymentName": "[take(concat('alz-HubSpoke2', variables('deploymentSuffix')), 64)]",
@@ -1735,7 +1873,6 @@
             "azVmHybridMonitorPolicyDeploymentName": "[take(concat('alz-AzVmHybridMonitor', variables('deploymentSuffix')), 64)]",
             "azBackupLzPolicyDeploymentName": "[take(concat('alz-AzBackupLz', variables('deploymentSuffix')), 64)]",
             "azBackupIdentityPolicyDeploymentName": "[take(concat('alz-AzBackupIdentity', variables('deploymentSuffix')), 64)]",
-            "azPolicyForAksPolicyDeploymentName": "[take(concat('alz-AksPolicy', variables('deploymentSuffix')), 64)]",
             "aksPrivEscalationPolicyDeploymentName": "[take(concat('alz-AksPrivEsc', variables('deploymentSuffix')), 64)]",
             "aksHttpsPolicyDeploymentName": "[take(concat('alz-AksHttps', variables('deploymentSuffix')), 64)]",
             "aksPrivilegedPolicyDeploymentName": "[take(concat('alz-AksPrivileged', variables('deploymentSuffix')), 64)]",
@@ -1781,6 +1918,7 @@
             "mdEndpointsDeploymentName": "[take(concat('alz-MDEndpoints', variables('deploymentSuffix')), 64)]",
             "mdEndpointsAMADeploymentName": "[take(concat('alz-MDEndpointsAMA', variables('deploymentSuffix')), 64)]",
             "corpConnectedLzVwanSubs": "[take(concat('alz-CorpConnLzsVwan', variables('deploymentSuffix')), 50)]",
+            "privateSubnetDeploymentName": "[take(concat('alz-pvtSubnet', variables('deploymentSuffix')), 64)]",
             "pidCuaDeploymentName": "[take(concat('pid-', variables('cuaid'), '-' , uniqueString(deployment().location, parameters('enterpriseScaleCompanyPrefix'), parameters('currentDateTimeUtcNow'))), 64)]",
             "denyClassicResourcePolicyDeploymentName": "[take(concat('alz-NoClassicResource', variables('deploymentSuffix')), 64)]",
             "costOptimizationDeploymentName": "[take(concat('alz-CostOptimization', variables('deploymentSuffix')), 64)]",
@@ -1812,6 +1950,7 @@
             "wsAPIMDeploymentName": "[take(concat('alz-wsAPIM', variables('deploymentSuffix')), 35)]",
             "wsAppServicesDeploymentName": "[take(concat('alz-wsAppService', variables('deploymentSuffix')), 35)]",
             "wsAutomationDeploymentName": "[take(concat('alz-wsAutomation', variables('deploymentSuffix')), 35)]",
+            "wsBotServiceDeploymentName": "[take(concat('alz-wsBotService', variables('deploymentSuffix')), 35)]",
             "wsCognitiveServicesDeploymentName": "[take(concat('alz-wsCognitiveServices', variables('deploymentSuffix')), 35)]",
             "wsComputeDeploymentName": "[take(concat('alz-wsCompute', variables('deploymentSuffix')), 35)]",
             "wsContainerAppsDeploymentName": "[take(concat('alz-wsContainerApps', variables('deploymentSuffix')), 35)]",
@@ -1842,7 +1981,6 @@
             "subnetNsgIdentityLitePolicyDeploymentName": "[take(concat('alz-SubnetNsgIdentity', variables('deploymentSuffix')), 64)]",
             "monitoringLiteDeploymentName": "[take(concat('alz-MonitoringLite', variables('deploymentSuffix')), 64)]",
             "logAnalyticsLitePolicyDeploymentName": "[take(concat('alz-LAPolicyLite', variables('deploymentSuffix')), 64)]",
-            "monitoringSolutionsLiteDeploymentName": "[take(concat('alz-SolutionsLite', variables('deploymentSuffix')), 64)]",
             "platformLiteSubscriptionPlacement": "[take(concat('alz-PlatformSubLite', variables('deploymentSuffix')), 64)]",
             "vnetConnectivityHubLiteDeploymentName": "[take(concat('alz-VnetHubLite', variables('deploymentSuffix')), 64)]",
             "vwanConnectivityHubLiteDeploymentName": "[take(concat('alz-VWanHubLite', variables('deploymentSuffix')), 64)]",
@@ -1853,6 +1991,8 @@
             "vnetConnectivityRouteTableDeploymentName": "[take(concat('alz-HubRoute', variables('deploymentSuffix')), 64)]",
             "vnetConnectivityRouteTable2DeploymentName": "[take(concat('alz-HubRoute2', variables('deploymentSuffix')), 64)]",
             "nvaConnectivityHubLite2DeploymentName": "[take(concat('alz-NVAHubLite2', variables('deploymentSuffix')), 64)]",
+            "avnmLiteConnectivityHubDeploymentName": "[take(concat('alz-AVNMLite', variables('deploymentSuffix')), 64)]",
+            "avnmLitePolicyDeploymentName": "[take(concat('alz-AVNMLitePolicy', variables('deploymentSuffix')), 64)]",
             "ddosRgLiteDeploymentName": "[take(concat('alz-DDoSRgLite', variables('deploymentSuffix')), 64)]",
             "ddosLiteDeploymentName": "[take(concat('alz-DDoSLite', variables('deploymentSuffix')), 64)]",
             "ddosHubLitePolicyDeploymentName": "[take(concat('alz-DDoSHubPolicyLite', variables('deploymentSuffix')), 64)]",
@@ -1920,6 +2060,7 @@
             "privateDnsRgResourceId": "[concat('/subscriptions/', variables('singleVsDedicatedConnectivitySub'), '/resourceGroups/', variables('platformRgNames').privateDnsRg)]",
             "azFirewallResourceId": "[concat('/subscriptions/', variables('singleVsDedicatedConnectivitySub'), '/resourceGroups/', variables('platformRgNames').connectivityRg, '/providers/Microsoft.Network/azureFirewalls/', variables('platformResourceNames').azFwName)]",
             "azFirewallResourceIdSecondary": "[concat('/subscriptions/', variables('singleVsDedicatedConnectivitySub'), '/resourceGroups/', variables('platformRgNames').connectivityRgSecondary, '/providers/Microsoft.Network/azureFirewalls/', variables('platformResourceNames').azFwNameSecondary)]",
+            "azFirewallResourceIdSecondaryVwan": "[concat('/subscriptions/', variables('singleVsDedicatedConnectivitySub'), '/resourceGroups/', variables('platformRgNames').connectivityRg, '/providers/Microsoft.Network/azureFirewalls/', variables('platformResourceNames').azFwNameSecondary)]",
             "userAssignedIdentityResourceId": "[concat('/subscriptions/', variables('singleVsDedicatedMgmtSub'), '/resourceGroups/', variables('platformRgNames').mgmtRg, '/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', variables('platformResourceNames').userAssignedIdentity)]"
         },
         // Declaring deterministic resourceId's for ES Lite platform resources (as they will be consolidated into a single platform subscription)
@@ -2111,7 +2252,7 @@
         },
         {
             // Deploying AMBA custom policies. Note: These policies are pulled from AMBA remote repo (https://www.github.com/Azure/azure-monitor-baseline-alerts). See definition of deploymentUris.monitorPolicyDefinitions for more details
-            "condition": "[and(empty(parameters('singlePlatformSubscriptionId')), equals(parameters('enableMonitorBaselines'), 'Yes'))]",
+            "condition": "[and(empty(parameters('singlePlatformSubscriptionId')), or(equals(parameters('enableMonitorBaselines'), 'Yes'), equals(parameters('enableServiceHealth'), 'Yes')))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "[variables('deploymentNames').monitorPolicyDeploymentName]",
@@ -2119,7 +2260,8 @@
             "scope": "[concat('Microsoft.Management/managementGroups/', parameters('enterpriseScaleCompanyPrefix'))]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').mgmtGroupDeploymentName)]",
-                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').mgmtGroupLiteDeploymentName)]"
+                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').mgmtGroupLiteDeploymentName)]",
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2150,53 +2292,79 @@
                         "value": "[variables('mgmtGroups').lzs]"
                     },
                     "enableAMBAConnectivity": {
-                        "value": "[parameters('enableMonitorConnectivity')]"
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableMonitorConnectivity'))]"
                     },
                     "enableAMBAIdentity": {
-                        "value": "[parameters('enableMonitorIdentity')]"
-                    },
-                    "enableAMBALandingZone": {
-                        "value": "[parameters('enableMonitorLandingZones')]"
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableMonitorIdentity'))]"
                     },
                     "enableAMBAManagement": {
-                        "value": "[parameters('enableMonitorManagement')]"
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableMonitorManagement'))]"
                     },
                     "enableAMBAServiceHealth": {
-                        "value": "[parameters('enableMonitorBaselines')]"
+                        "value": "[parameters('enableServiceHealth')]"
                     },
-                    "delayCount": {
-                        "value": "[parameters('delayCount')]"
+                    "enableAMBAHybridVM": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAHybridVM'))]"
                     },
-                    "policyAssignmentParametersCommon": {
-                        "value": {
-                            "alzMonitorResourceGroupName": {
-                                "value": "[parameters('monitorAlertsResourceGroup')]"
-                            },
-                            "alzMonitorResourceGroupLocation": {
-                                "value": "[deployment().location]"
-                            }
-                        }
+                    "enableAMBAKeyManagement": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAKeyManagement'))]"
                     },
-                    "policyAssignmentParametersServiceHealth": {
-                        "value": {
-                            "alzMonitorActionGroupEmail": {
-                                "value": "[parameters('emailContactActionGroup')]"
-                            }
-                        }
+                    "enableAMBALoadBalancing": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBALoadBalancing'))]"
+                    },
+                    "enableAMBANetworkChanges": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBANetworkChanges'))]"
+                    },
+                    "enableAMBARecoveryServices": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBARecoveryServices'))]"
+                    },
+                    "enableAMBAStorage": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAStorage'))]"
+                    },
+                    "enableAMBAVM": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAVM'))]"
+                    },
+                    "enableAMBAWeb": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAWeb'))]"
+                    },
+                    "userAssignedManagedIdentityName": {
+                        "value": "[parameters('userAssignedManagedIdentityName')]"
+                    },
+                    "ALZWebhookServiceUri": {
+                        "value": "[if(empty(parameters('ambaAgServiceHook')), null(), array(parameters('ambaAgServiceHook')))]"
+                    },
+                    "ALZArmRoleId": {
+                        "value": "[array(parameters('ambaAgArmRole'))]"
+                    },
+                    "ALZMonitorResourceGroupName": {
+                        "value": "[parameters('monitorAlertsResourceGroup')]"
+                    },
+                    "ALZMonitorResourceGroupLocation": {
+                        "value": "[deployment().location]"
+                    },
+                    "ALZMonitorActionGroupEmail": {
+                        "value": "[if(empty(parameters('ambaAgEmailContact')), null(), array(parameters('ambaAgEmailContact')))]"
+                    },
+                    "managementSubscriptionId": {
+                        "value": "[parameters('managementSubscriptionId')]"
+                    },
+                    "deployALZPortalAccelerator": {
+                        "value": "Yes"
                     }
                 }
             }
         },
         {
             /// Deploying AMBA custom policies. Note: These policies are pulled from AMBA remote repo (https://www.github.com/Azure/azure-monitor-baseline-alerts). See definition of deploymentUris.monitorPolicyDefinitions for more details
-            "condition": "[and(not(empty(parameters('singlePlatformSubscriptionId'))), equals(parameters('enableMonitorBaselines'), 'Yes'))]",
+            "condition": "[and(not(empty(parameters('singlePlatformSubscriptionId'))), or(equals(parameters('enableMonitorBaselines'), 'Yes'), equals(parameters('enableServiceHealth'), 'Yes')))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "[variables('esLiteDeploymentNames').monitorPolicyLiteDeploymentName]",
             "location": "[deployment().location]",
             "scope": "[concat('Microsoft.Management/managementGroups/', parameters('enterpriseScaleCompanyPrefix'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').mgmtGroupLiteDeploymentName)]"
+                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').mgmtGroupLiteDeploymentName)]",
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2227,67 +2395,127 @@
                         "value": "[variables('mgmtGroups').lzs]"
                     },
                     "enableAMBAConnectivity": {
-                        "value": "[parameters('enableMonitorConnectivity')]"
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableMonitorConnectivity'))]"
                     },
                     "enableAMBAIdentity": {
-                        "value": "[parameters('enableMonitorIdentity')]"
-                    },
-                    "enableAMBALandingZone": {
-                        "value": "[parameters('enableMonitorLandingZones')]"
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableMonitorIdentity'))]"
                     },
                     "enableAMBAManagement": {
-                        "value": "[parameters('enableMonitorManagement')]"
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableMonitorManagement'))]"
                     },
                     "enableAMBAServiceHealth": {
-                        "value": "[parameters('enableMonitorBaselines')]"
+                        "value": "[parameters('enableServiceHealth')]"
                     },
-                    "delayCount": {
-                        "value": "[parameters('delayCount')]"
+                    "enableAMBAHybridVM": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAHybridVM'))]"
                     },
-                    "policyAssignmentParametersCommon": {
-                        "value": {
-                            "alzMonitorResourceGroupName": {
-                                "value": "[parameters('monitorAlertsResourceGroup')]"
-                            },
-                            "alzMonitorResourceGroupLocation": {
-                                "value": "[deployment().location]"
-                            }
-                        }
+                    "enableAMBAKeyManagement": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAKeyManagement'))]"
                     },
-                    "policyAssignmentParametersServiceHealth": {
-                        "value": {
-                            "alzMonitorActionGroupEmail": {
-                                "value": "[parameters('emailContactActionGroup')]"
-                            }
-                        }
+                    "enableAMBALoadBalancing": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBALoadBalancing'))]"
+                    },
+                    "enableAMBANetworkChanges": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBANetworkChanges'))]"
+                    },
+                    "enableAMBARecoveryServices": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBARecoveryServices'))]"
+                    },
+                    "enableAMBAStorage": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAStorage'))]"
+                    },
+                    "enableAMBAVM": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAVM'))]"
+                    },
+                    "enableAMBAWeb": {
+                        "value": "[if(and(equals(parameters('enableMonitorBaselines'), 'No'), equals(parameters('enableServiceHealth'), 'Yes')), 'No', parameters('enableAMBAWeb'))]"
+                    },
+                    "userAssignedManagedIdentityName": {
+                        "value": "[parameters('userAssignedManagedIdentityName')]"
+                    },
+                    "ALZWebhookServiceUri": {
+                        "value": "[if(empty(parameters('ambaAgServiceHook')), null(), array(parameters('ambaAgServiceHook')))]"
+                    },
+                    "ALZArmRoleId": {
+                        "value": "[array(parameters('ambaAgArmRole'))]"
+                    },
+                    "ALZMonitorResourceGroupName": {
+                        "value": "[parameters('monitorAlertsResourceGroup')]"
+                    },
+                    "ALZMonitorResourceGroupLocation": {
+                        "value": "[deployment().location]"
+                    },
+                    "ALZMonitorActionGroupEmail": {
+                        "value": "[if(empty(parameters('ambaAgEmailContact')), null(), array(parameters('ambaAgEmailContact')))]"
+                    },
+                    "managementSubscriptionId": {
+                        "value": "[parameters('singlePlatformSubscriptionId')]"
+                    },
+                    "deployALZPortalAccelerator": {
+                        "value": "Yes"
                     }
                 }
             }
         },
         {
-            // One of Azure's untold stories.....
+            // ALZ Pre-Requisites and Azure's Untold Story...
+            "condition": "[not(empty(parameters('managementSubscriptionId')))]",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-10-01",
-            "name": "[concat('preparingToLaunch', copyIndex())]",
+            "apiVersion": "2020-06-01",
+            "name": "alz-prerequisites",
+            "scope": "[variables('scopes').eslzRootManagementGroup]",
             "location": "[deployment().location]",
-            "scope": "[concat('Microsoft.Management/managementGroups/', parameters('enterpriseScaleCompanyPrefix'))]",
             "dependsOn": [
-                "[variables('deploymentNames').initiativeDeploymentName]"
+                "[variables('deploymentNames').initiativeDeploymentName]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').mgmtSubscriptionPlacement)]"
             ],
-            "copy": {
-                "batchSize": 1,
-                "count": "[parameters('delayCount')]",
-                "mode": "Serial",
-                "name": "policyCompletion"
-            },
             "properties": {
                 "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
+                "templateLink": {
                     "contentVersion": "1.0.0.0",
-                    "parameters": {},
-                    "resources": [],
-                    "outputs": {}
+                    "uri": "[variables('deploymentUris').preRequisites]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[deployment().location]"
+                    },
+                    "eslzRootName": {
+                        "value": "[parameters('enterpriseScaleCompanyPrefix')]"
+                    },
+                    "managementSubscriptionId": {
+                        "value": "[parameters('managementSubscriptionId')]"
+                    }
+                }
+            }
+        },
+        {
+            // ALZ Pre-Requisites and Azure's Untold Story... LITE
+            "condition": "[not(empty(parameters('singlePlatformSubscriptionId')))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "name": "alz-prerequisites",
+            "scope": "[variables('scopes').eslzRootManagementGroup]",
+            "location": "[deployment().location]",
+            "dependsOn": [
+                "[variables('deploymentNames').initiativeDeploymentName]",
+                "[variables('esLiteDeploymentNames').mgmtGroupLiteDeploymentName]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').preRequisites]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[deployment().location]"
+                    },
+                    "eslzRootName": {
+                        "value": "[parameters('enterpriseScaleCompanyPrefix')]"
+                    },
+                    "managementSubscriptionId": {
+                        "value": "[parameters('singlePlatformSubscriptionId')]"
+                    }
                 }
             }
         },
@@ -2375,6 +2603,7 @@
                 }
             }
         },
+
         /*
             The following deployments will optionally configure the governance, security, and monitoring for the Azure platform and landing zones
         */
@@ -2388,7 +2617,7 @@
             "subscriptionId": "[parameters('managementSubscriptionId')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').mgmtSubscriptionPlacement)]",
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2414,6 +2643,9 @@
                     },
                     "retentionInDays": {
                         "value": "[parameters('retentionInDays')]"
+                    },
+                    "enableSentinel": {
+                        "value": "[parameters('enableSentinel')]"
                     }
                 }
             }
@@ -2539,40 +2771,6 @@
             }
         },
         {
-            // Deploying Sentinel to Log Analytics workspace if condition is true
-            "condition": "[and(equals(parameters('enableLogAnalytics'), 'Yes'), not(empty(parameters('managementSubscriptionId'))), equals(parameters('enableSecuritySolution'), 'Yes'))]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-10-01",
-            "name": "[variables('deploymentNames').monitoringSolutionsDeploymentName]",
-            "location": "[deployment().location]",
-            "subscriptionId": "[parameters('managementSubscriptionId')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "contentVersion": "1.0.0.0",
-                    "uri": "[variables('deploymentUris').monitoringSolutions]"
-                },
-                "parameters": {
-                    "rgName": {
-                        "value": "[variables('platformRgNames').mgmtRg]"
-                    },
-                    "workspaceName": {
-                        "value": "[variables('platformResourceNames').logAnalyticsWorkspace]"
-                    },
-                    "workspaceRegion": {
-                        "value": "[deployment().location]"
-                    },
-                    "enableSecuritySolution": {
-                        "value": "[parameters('enableSecuritySolution')]"
-                    }
-                }
-            }
-        },
-        {
             // Assigning Log Analytics workspace policy to management management group if condition is true
             "condition": "[and(equals(parameters('enableLogAnalytics'), 'Yes'), not(empty(parameters('managementSubscriptionId'))))]",
             "type": "Microsoft.Resources/deployments",
@@ -2582,7 +2780,7 @@
             "location": "[deployment().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').mgmtSubscriptionPlacement)]",
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2687,7 +2885,7 @@
             "location": "[deployment().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').mgmtSubscriptionPlacement)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').monitoringLiteDeploymentName)]"
             ],
@@ -2702,7 +2900,7 @@
         },
         {
             // Assigning Workload Specific Customer Managed Keys Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsCMKInitiatives'), 'Yes'), not(empty(parameters('wsCMKSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsCMKInitiatives'), 'Yes'), equals(parameters('enableWsCMKInitiatives'), 'Audit')), not(empty(parameters('wsCMKSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsCMKDeploymentName, '-', replace(parameters('wsCMKSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -2724,7 +2922,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -2743,13 +2941,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsCMKInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific APIM Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsAPIMInitiatives'), 'Yes'), not(empty(parameters('wsAPIMSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsAPIMInitiatives'), 'Yes'), equals(parameters('enableWsAPIMInitiatives'), 'Audit')), not(empty(parameters('wsAPIMSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsAPIMDeploymentName, '-', replace(parameters('wsAPIMSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -2771,7 +2972,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -2790,13 +2991,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsAPIMInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific App Services Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsAppServicesInitiatives'), 'Yes'), not(empty(parameters('wsAppServicesSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsAppServicesInitiatives'), 'Yes'), equals(parameters('enableWsAppServicesInitiatives'), 'Audit')), not(empty(parameters('wsAppServicesSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsAppServicesDeploymentName, '-', replace(parameters('wsAppServicesSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -2818,7 +3022,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -2837,13 +3041,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsAppServicesInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Automation Accounts Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsAutomationInitiatives'), 'Yes'), not(empty(parameters('wsAutomationSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsAutomationInitiatives'), 'Yes'), equals(parameters('enableWsAutomationInitiatives'), 'Audit')), not(empty(parameters('wsAutomationSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsAutomationDeploymentName, '-', replace(parameters('wsAutomationSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -2865,7 +3072,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -2884,13 +3091,66 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsAutomationInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
+                    }
+                }
+            }
+        },
+        {
+            // Assigning Workload Specific Bot Service Initiaitve to selected management groups if condition is true
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsBotServiceInitiatives'), 'Yes'), equals(parameters('enableWsBotServiceInitiatives'), 'Audit')), not(empty(parameters('wsBotServiceSelectorMG'))))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "name": "[take(concat(variables('deploymentNames').wsBotServiceDeploymentName, '-', replace(parameters('wsBotServiceSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
+            "scope": "[concat('Microsoft.Management/managementGroups/', replace(parameters('wsBotServiceSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix')))]",
+            "location": "[deployment().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').mgmtSubscriptionPlacement)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').vnetConnectivityHubDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').vwanConnectivityHubDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').nvaConnectivityHubDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ddosLzPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').policyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').initiativeDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').activityDiagnosticsPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ascPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ascGovPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').resourceDiagnosticsPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vwanConnectivityHubLiteDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
+                "alz-prerequisites",
+                "corpConnectedMoveLzs"
+            ],
+            "copy": {
+                "name": "wsAutomationmg",
+                "count": "[length(parameters('wsBotServiceSelectorMG'))]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').wsBotServicePolicyAssignment]"
+                },
+                "parameters": {
+                    "topLevelManagementGroupPrefix": {
+                        "value": "[parameters('enterpriseScaleCompanyPrefix')]"
+                    },
+                    "assignmentIndex": {
+                        "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsBotServiceInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Cognitive Services Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsCognitiveServicesInitiatives'), 'Yes'), not(empty(parameters('wsCognitiveServicesSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsCognitiveServicesInitiatives'), 'Yes'), equals(parameters('enableWsCognitiveServicesInitiatives'), 'Audit')), not(empty(parameters('wsCognitiveServicesSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsCognitiveServicesDeploymentName, '-', replace(parameters('wsCognitiveServicesSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -2912,7 +3172,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -2931,13 +3191,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsCognitiveServicesInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Compute Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsComputeInitiatives'), 'Yes'), not(empty(parameters('wsComputeSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsComputeInitiatives'), 'Yes'), equals(parameters('enableWsComputeInitiatives'), 'Audit')), not(empty(parameters('wsComputeSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsComputeDeploymentName, '-', replace(parameters('wsComputeSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -2959,7 +3222,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -2978,13 +3241,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsComputeInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Container Apps Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsContainerAppsInitiatives'), 'Yes'), not(empty(parameters('wsContainerAppsSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsContainerAppsInitiatives'), 'Yes'), equals(parameters('enableWsContainerAppsInitiatives'), 'Audit')), not(empty(parameters('wsContainerAppsSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsContainerAppsDeploymentName, '-', replace(parameters('wsContainerAppsSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3006,7 +3272,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3025,13 +3291,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsContainerAppsInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Container Instance Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsContainerInstanceInitiatives'), 'Yes'), not(empty(parameters('wsContainerInstanceSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsContainerInstanceInitiatives'), 'Yes'), equals(parameters('enableWsContainerInstanceInitiatives'), 'Audit')), not(empty(parameters('wsContainerInstanceSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsContainerInstanceDeploymentName, '-', replace(parameters('wsContainerInstanceSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3053,7 +3322,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3072,13 +3341,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsContainerInstanceInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Container Registry Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsContainerRegistryInitiatives'), 'Yes'), not(empty(parameters('wsContainerRegistrySelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsContainerRegistryInitiatives'), 'Yes'), equals(parameters('enableWsContainerRegistryInitiatives'), 'Audit')), not(empty(parameters('wsContainerRegistrySelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsContainerRegistryDeploymentName, '-', replace(parameters('wsContainerRegistrySelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3100,7 +3372,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3119,13 +3391,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsContainerRegistryInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Cosmos DB Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsCosmosDbInitiatives'), 'Yes'), not(empty(parameters('wsCosmosDbSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsCosmosDbInitiatives'), 'Yes'), equals(parameters('enableWsCosmosDbInitiatives'), 'Audit')), not(empty(parameters('wsCosmosDbSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsCosmosDbDeploymentName, '-', replace(parameters('wsCosmosDbSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3147,7 +3422,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3166,13 +3441,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsCosmosDbInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Data Explorer Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsDataExplorerInitiatives'), 'Yes'), not(empty(parameters('wsDataExplorerSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsDataExplorerInitiatives'), 'Yes'), equals(parameters('enableWsDataExplorerInitiatives'), 'Audit')), not(empty(parameters('wsDataExplorerSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsDataExplorerDeploymentName, '-', replace(parameters('wsDataExplorerSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3194,7 +3472,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3213,13 +3491,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsDataExplorerInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Data Factory Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsDataFactoryInitiatives'), 'Yes'), not(empty(parameters('wsDataFactorySelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsDataFactoryInitiatives'), 'Yes'), equals(parameters('enableWsDataFactoryInitiatives'), 'Audit')), not(empty(parameters('wsDataFactorySelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsDataFactoryDeploymentName, '-', replace(parameters('wsDataFactorySelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3241,7 +3522,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3260,13 +3541,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsDataFactoryInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Event Grid Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsEventGridInitiatives'), 'Yes'), not(empty(parameters('wsEventGridSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsEventGridInitiatives'), 'Yes'), equals(parameters('enableWsEventGridInitiatives'), 'Audit')), not(empty(parameters('wsEventGridSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsEventGridDeploymentName, '-', replace(parameters('wsEventGridSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3288,7 +3572,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3307,13 +3591,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsEventGridInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Event Hub Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsEventHubInitiatives'), 'Yes'), not(empty(parameters('wsEventHubSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsEventHubInitiatives'), 'Yes'), equals(parameters('enableWsEventHubInitiatives'), 'Audit')), not(empty(parameters('wsEventHubSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsEventHubDeploymentName, '-', replace(parameters('wsEventHubSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3335,7 +3622,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3354,13 +3641,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsEventHubInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Key Vault Supplementary Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsKeyVaultSupInitiatives'), 'Yes'), not(empty(parameters('wsKeyVaultSupSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsKeyVaultSupInitiatives'), 'Yes'), equals(parameters('enableWsKeyVaultSupInitiatives'), 'Audit')), not(empty(parameters('wsKeyVaultSupSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsKeyVaultSupDeploymentName, '-', replace(parameters('wsKeyVaultSupSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3382,7 +3672,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3401,13 +3691,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsKeyVaultSupInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Kubernetes Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsKubernetesInitiatives'), 'Yes'), not(empty(parameters('wsKubernetesSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsKubernetesInitiatives'), 'Yes'), equals(parameters('enableWsKubernetesInitiatives'), 'Audit')), not(empty(parameters('wsKubernetesSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsKubernetesDeploymentName, '-', replace(parameters('wsKubernetesSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3429,7 +3722,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3448,13 +3741,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsKubernetesInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Machine Learning Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsMachineLearningInitiatives'), 'Yes'), not(empty(parameters('wsMachineLearningSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsMachineLearningInitiatives'), 'Yes'), equals(parameters('enableWsMachineLearningInitiatives'), 'Audit')), not(empty(parameters('wsMachineLearningSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsMachineLearningDeploymentName, '-', replace(parameters('wsMachineLearningSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3476,7 +3772,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3495,13 +3791,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsMachineLearningInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific MySQL Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsMySQLInitiatives'), 'Yes'), not(empty(parameters('wsMySQLSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsMySQLInitiatives'), 'Yes'), equals(parameters('enableWsMySQLInitiatives'), 'Audit')), not(empty(parameters('wsMySQLSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsMySQLDeploymentName, '-', replace(parameters('wsMySQLSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3523,7 +3822,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3542,13 +3841,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsMySQLInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Network and Networking services Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsNetworkInitiatives'), 'Yes'), not(empty(parameters('wsNetworkSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsNetworkInitiatives'), 'Yes'), equals(parameters('enableWsNetworkInitiatives'), 'Audit')), not(empty(parameters('wsNetworkSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsNetworkDeploymentName, '-', replace(parameters('wsNetworkSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3570,7 +3872,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3592,13 +3894,16 @@
                     },
                     "ddosPlanResourceId": {
                         "value": "[variables('platformResourceIds').ddosProtectionResourceId]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsNetworkInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific OpenAI Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsOpenAIInitiatives'), 'Yes'), not(empty(parameters('wsOpenAISelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsOpenAIInitiatives'), 'Yes'), equals(parameters('enableWsOpenAIInitiatives'), 'Audit')), not(empty(parameters('wsOpenAISelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsOpenAIDeploymentName, '-', replace(parameters('wsOpenAISelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3620,7 +3925,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3639,13 +3944,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsOpenAIInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific PostgreSQL Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsPostgreSQLInitiatives'), 'Yes'), not(empty(parameters('wsPostgreSQLSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsPostgreSQLInitiatives'), 'Yes'), equals(parameters('enableWsPostgreSQLInitiatives'), 'Audit')), not(empty(parameters('wsPostgreSQLSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsPostgreSQLDeploymentName, '-', replace(parameters('wsPostgreSQLSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3667,7 +3975,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3686,13 +3994,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsPostgreSQLInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Service Bus Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsServiceBusInitiatives'), 'Yes'), not(empty(parameters('wsServiceBusSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsServiceBusInitiatives'), 'Yes'), equals(parameters('enableWsServiceBusInitiatives'), 'Audit')), not(empty(parameters('wsServiceBusSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsServiceBusDeploymentName, '-', replace(parameters('wsServiceBusSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3714,7 +4025,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3733,13 +4044,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsServiceBusInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific SQL Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsSQLInitiatives'), 'Yes'), not(empty(parameters('wsSQLSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsSQLInitiatives'), 'Yes'), equals(parameters('enableWsSQLInitiatives'), 'Audit')), not(empty(parameters('wsSQLSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsSQLDeploymentName, '-', replace(parameters('wsSQLSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3761,7 +4075,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3780,13 +4094,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsSQLInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Storage Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsStorageInitiatives'), 'Yes'), not(empty(parameters('wsStorageSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsStorageInitiatives'), 'Yes'), equals(parameters('enableWsStorageInitiatives'), 'Audit')), not(empty(parameters('wsStorageSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsStorageDeploymentName, '-', replace(parameters('wsStorageSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3808,7 +4125,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3827,13 +4144,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsStorageInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Synapse Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsSynapseInitiatives'), 'Yes'), not(empty(parameters('wsSynapseSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsSynapseInitiatives'), 'Yes'), equals(parameters('enableWsSynapseInitiatives'), 'Audit')), not(empty(parameters('wsSynapseSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsSynapseDeploymentName, '-', replace(parameters('wsSynapseSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3855,7 +4175,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3874,13 +4194,16 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsSynapseInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
         },
         {
             // Assigning Workload Specific Virtual Desktop Initiaitve to selected management groups if condition is true
-            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), equals(parameters('enableWsVirtualDesktopInitiatives'), 'Yes'), not(empty(parameters('wsVirtualDesktopSelectorMG'))))]",
+            "condition": "[and(or(not(empty(parameters('singlePlatformSubscriptionId'))), not(empty(parameters('managementSubscriptionId')))), or(equals(parameters('enableWsVirtualDesktopInitiatives'), 'Yes'), equals(parameters('enableWsVirtualDesktopInitiatives'), 'Audit')), not(empty(parameters('wsVirtualDesktopSelectorMG'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "[take(concat(variables('deploymentNames').wsVirtualDesktopDeploymentName, '-', replace(parameters('wsVirtualDesktopSelectorMG')[copyIndex()], 'contoso', parameters('enterpriseScaleCompanyPrefix'))), 64)]",
@@ -3902,7 +4225,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').vnetConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').nvaConnectivityHubLiteDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').monitoringDeploymentName)]",
-                "policyCompletion",
+                "alz-prerequisites",
                 "corpConnectedMoveLzs"
             ],
             "copy": {
@@ -3921,6 +4244,9 @@
                     },
                     "assignmentIndex": {
                         "value": "[copyIndex()]"
+                    },
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enableWsVirtualDesktopInitiatives'), 'Yes'), 'Default', 'DoNotEnforce')]"
                     }
                 }
             }
@@ -4096,6 +4422,9 @@
                     },
                     "logAnalyticsResourceId": {
                         "value": "[variables('platformResourceIds').logAnalyticsResourceId]"
+                    },
+                    "laCategory": {
+                        "value": "[parameters('laCategory')]"
                     }
                 }
             }
@@ -4137,7 +4466,7 @@
             "scope": "[variables('scopes').eslzRootManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4161,7 +4490,7 @@
             "scope": "[variables('scopes').eslzRootManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4185,7 +4514,7 @@
             "scope": "[variables('scopes').eslzRootManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4209,7 +4538,7 @@
             "scope": "[variables('scopes').eslzRootManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4515,7 +4844,7 @@
             "scope": "[variables('scopes').eslzRootManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4585,7 +4914,7 @@
             "scope": "[variables('scopes').platformManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4810,7 +5139,8 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').asbPolicyDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ascPolicyDeploymentName)]",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ascGovPolicyDeploymentName)]",
-                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ddosDeploymentName)]"
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ddosDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').vnetConnectivityHubDeploymentName)]"
             ],
             "location": "[deployment().location]",
             "properties": {
@@ -4999,6 +5329,158 @@
                     },
                     "vWANHubCapacitySecondary": {
                         "value": "[parameters('vWANHubCapacitySecondary')]"
+                    }
+                }
+            }
+        },
+        {
+            // Deploy AVNM
+            "condition": "[and(parameters('deployAVNM'), or(equals(parameters('enableHub'), 'vhub'), equals(parameters('enableHub'), 'nva')), not(empty(parameters('connectivitySubscriptionId'))))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "subscriptionId": "[parameters('connectivitySubscriptionId')]",
+            "name": "[variables('deploymentNames').avnmConnectivityHubDeploymentName]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').connectivitySubscriptionPlacement)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').activityDiagnosticsPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').resourceDiagnosticsPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').asbPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ascPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ascGovPolicyDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').ddosDeploymentName)]",
+                "alz-prerequisites"
+            ],
+            "location": "[deployment().location]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').avnmConnectivityHub]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('connectivityLocation')]"
+                    },
+                    "locationSecondary": {
+                        "value": "[parameters('connectivityLocationSecondary')]"
+                    },
+                    "managementGroupScope": {
+                        "value": "[variables('scopes').eslzRootManagementGroup]"
+                    },
+                    "connectivitySubscriptionId": {
+                        "value": "[parameters('connectivitySubscriptionId')]"
+                    },
+                    "enableSecondaryRegion": {
+                        "value": "[parameters('enableSecondaryRegion')]"
+                    }
+                }
+            }
+        },
+        {
+            // Deploy AVNM Lite
+            "condition": "[and(parameters('deployAVNM'), or(equals(parameters('enableHub'), 'vhub'), equals(parameters('enableHub'), 'nva')), not(empty(parameters('singlePlatformSubscriptionId'))))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "subscriptionId": "[parameters('singlePlatformSubscriptionId')]",
+            "name": "[variables('esLiteDeploymentNames').avnmLiteConnectivityHubDeploymentName]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').mgmtGroupDeploymentName)]",
+                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').mgmtGroupLiteDeploymentName)]",
+                "dnsZones",
+                "dnsZonesLite",
+                "alz-prerequisites"
+            ],
+            "location": "[deployment().location]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').avnmConnectivityHub]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('connectivityLocation')]"
+                    },
+                    "locationSecondary": {
+                        "value": "[parameters('connectivityLocationSecondary')]"
+                    },
+                    "managementGroupScope": {
+                        "value": "[variables('scopes').eslzRootManagementGroup]"
+                    },
+                    "connectivitySubscriptionId": {
+                        "value": "[parameters('singlePlatformSubscriptionId')]"
+                    },
+                    "enableSecondaryRegion": {
+                        "value": "[parameters('enableSecondaryRegion')]"
+                    }
+                }
+            }
+        },
+        {
+            // Deploying AVNM policy - to add virtual networks to AVNM network groups
+            "condition": "[and(parameters('deployAVNM'), or(equals(parameters('enableHub'), 'vhub'), equals(parameters('enableHub'), 'nva')), not(empty(parameters('connectivitySubscriptionId'))))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[variables('deploymentNames').avnmPolicyDeploymentName]",
+            "location": "[deployment().location]",
+            "scope": "[variables('scopes').eslzRootManagementGroup]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').avnmConnectivityHubDeploymentName)]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').avnmPolicy]"
+                },
+                "parameters": {
+                    "topLevelManagementGroupPrefix": {
+                        "value": "[parameters('enterpriseScaleCompanyPrefix')]"
+                    },
+                    "connectivitySubscriptionId": {
+                        "value": "[parameters('connectivitySubscriptionId')]"
+                    },
+                    "locationSecondary": {
+                        "value": "[parameters('connectivityLocationSecondary')]"
+                    },
+                    "enableSecondaryRegion": {
+                        "value": "[parameters('enableSecondaryRegion')]"
+                    }
+                }
+            }
+        },
+        {
+            // Deploying AVNM Lite policy - to add virtual networks to AVNM network groups
+            "condition": "[and(parameters('deployAVNM'), or(equals(parameters('enableHub'), 'vhub'), equals(parameters('enableHub'), 'nva')), not(empty(parameters('singlePlatformSubscriptionId'))))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[variables('esLiteDeploymentNames').avnmLitePolicyDeploymentName]",
+            "location": "[deployment().location]",
+            "scope": "[variables('scopes').eslzRootManagementGroup]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').avnmLiteConnectivityHubDeploymentName)]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').avnmPolicy]"
+                },
+                "parameters": {
+                    "topLevelManagementGroupPrefix": {
+                        "value": "[parameters('enterpriseScaleCompanyPrefix')]"
+                    },
+                    "connectivitySubscriptionId": {
+                        "value": "[parameters('singlePlatformSubscriptionId')]"
+                    },
+                    "locationSecondary": {
+                        "value": "[parameters('connectivityLocationSecondary')]"
+                    },
+                    "enableSecondaryRegion": {
+                        "value": "[parameters('enableSecondaryRegion')]"
+                    },
+                    "dedicatedSubscription": {
+                        "value": false
                     }
                 }
             }
@@ -5500,7 +5982,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').mgmtGroupLiteDeploymentName)]",
                 "dnsZones",
                 "dnsZonesLite",
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5792,7 +6274,7 @@
             "scope": "[variables('scopes').platformManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5825,7 +6307,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6188,7 +6670,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6237,33 +6719,6 @@
             }
         },
         {
-            // Assigning Azure Policy enablement policy for AKS to landing zones management group if condition is true
-            "condition": "[or(equals(parameters('enableAksPolicy'), 'Yes'), equals(parameters('enableAksPolicy'), 'Audit'))]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-10-01",
-            "name": "[variables('deploymentNames').azPolicyForAksPolicyDeploymentName]",
-            "scope": "[variables('scopes').lzsManagementGroup]",
-            "location": "[deployment().location]",
-            "dependsOn": [
-                "policyCompletion"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "contentVersion": "1.0.0.0",
-                    "uri": "[variables('deploymentUris').azPolicyForAksPolicyAssignment]"
-                },
-                "parameters": {
-                    "topLevelManagementGroupPrefix": {
-                        "value": "[parameters('enterpriseScaleCompanyPrefix')]"
-                    },
-                    "enforcementMode": {
-                        "value": "[if(equals(parameters('enableaksPolicy'), 'Yes'), 'Default', 'DoNotEnforce')]"
-                    }
-                }
-            }
-        },
-        {
             // Assigning Aks Priv Escalation policy to landing zones management group if condition is true
             "condition": "[or(equals(parameters('denyAksPrivilegedEscalation'), 'Yes'), equals(parameters('denyAksPrivilegedEscalation'), 'Audit'))]",
             "type": "Microsoft.Resources/deployments",
@@ -6272,7 +6727,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6296,7 +6751,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6320,7 +6775,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6344,7 +6799,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6371,7 +6826,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6395,7 +6850,7 @@
             "scope": "[variables('scopes').corpManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6422,7 +6877,7 @@
             "scope": "[variables('scopes').corpManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6446,7 +6901,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6465,6 +6920,58 @@
             }
         },
         {
+            "condition": "[or(equals(parameters('enablePrivateSubnet'), 'Yes'), equals(parameters('enablePrivateSubnet'), 'Audit'))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2022-09-01",
+            "name": "[variables('deploymentNames').privateSubnetDeploymentName]",
+            "scope": "[variables('scopes').platformManagementGroup]",
+            "location": "[deployment().location]",
+            "dependsOn": [
+                "alz-prerequisites"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').privateSubnetPolicyAssignment]"
+                },
+                "parameters": {
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enablePrivateSubnet'), 'Yes'), 'Default', 'DoNotEnforce')]"
+                    },
+                    "effect": {
+                        "value": "[if(equals(parameters('enablePrivateSubnet'), 'Yes'), 'Deny', 'Audit')]"
+                    }
+                }
+            }
+        },
+        {
+            "condition": "[or(equals(parameters('enablePrivateSubnet'), 'Yes'), equals(parameters('enablePrivateSubnet'), 'Audit'))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2022-09-01",
+            "name": "[variables('deploymentNames').privateSubnetDeploymentName]",
+            "scope": "[variables('scopes').lzsManagementGroup]",
+            "location": "[deployment().location]",
+            "dependsOn": [
+                "alz-prerequisites"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').privateSubnetPolicyAssignment]"
+                },
+                "parameters": {
+                    "enforcementMode": {
+                        "value": "[if(equals(parameters('enablePrivateSubnet'), 'Yes'), 'Default', 'DoNotEnforce')]"
+                    },
+                    "effect": {
+                        "value": "[if(equals(parameters('enablePrivateSubnet'), 'Yes'), 'Deny', 'Audit')]"
+                    }
+                }
+            }
+        },
+        {
             // Assigning deny storage without https policy to landing zones management group if condition is true
             "condition": "[or(equals(parameters('enableStorageHttps'), 'Yes'), equals(parameters('enableStorageHttps'), 'Audit'))]",
             "type": "Microsoft.Resources/deployments",
@@ -6473,7 +6980,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6497,7 +7004,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6524,7 +7031,7 @@
             "scope": "[variables('scopes').platformManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6551,7 +7058,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6578,7 +7085,7 @@
             "scope": "[variables('scopes').platformManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6605,7 +7112,7 @@
             "scope": "[variables('scopes').corpManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6629,7 +7136,7 @@
             "scope": "[variables('scopes').corpManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6659,7 +7166,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6683,7 +7190,7 @@
             "scope": "[variables('scopes').eslzRootManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6710,7 +7217,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6830,7 +7337,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6857,7 +7364,7 @@
             "scope": "[variables('scopes').lzsManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6884,7 +7391,7 @@
             "scope": "[variables('scopes').decommissionedManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6911,7 +7418,7 @@
             "scope": "[variables('scopes').sandboxManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6941,7 +7448,7 @@
             "scope": "[variables('scopes').identityManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -6968,7 +7475,7 @@
             "scope": "[variables('scopes').identityManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion",
+                "alz-prerequisites",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').identitySubscriptionPlacement)]"
             ],
             "properties": {
@@ -6993,7 +7500,7 @@
             "scope": "[variables('scopes').identityManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion",
+                "alz-prerequisites",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').identitySubscriptionPlacement)]"
             ],
             "properties": {
@@ -7021,7 +7528,7 @@
             "scope": "[variables('scopes').identityManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion",
+                "alz-prerequisites",
                 "[resourceId('Microsoft.Resources/deployments', variables('deploymentNames').identitySubscriptionPlacement)]"
             ],
             "properties": {
@@ -7223,7 +7730,7 @@
                         "value": "[variables('platformResourceIds').vWanHubResourceIdSecondary]"
                     },
                     "azureFirewallResourceId": {
-                        "value": "[if(equals(parameters('enableAzFwDnsProxySecondary'), 'Yes'), variables('platformResourceIds').azFirewallResourceIdSecondary, '')]"
+                        "value": "[if(equals(parameters('enableAzFwDnsProxySecondary'), 'Yes'), variables('platformResourceIds').azFirewallResourceIdSecondaryVwan, '')]"
                     }
                 }
             }
@@ -7518,7 +8025,7 @@
             "subscriptionId": "[parameters('singlePlatformSubscriptionId')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('esliteDeploymentNames').platformLiteSubscriptionPlacement)]",
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -7544,6 +8051,9 @@
                     },
                     "retentionInDays": {
                         "value": "[parameters('retentionInDays')]"
+                    },
+                    "enableSentinel": {
+                        "value": "[parameters('enableSentinel')]"
                     }
                 }
             }
@@ -7582,43 +8092,6 @@
             }
         },
         /*
-            Note: ES Lite only: the following deployments will deploy Sentinel to the platform subscription
-        */
-        {
-            // Deploying Sentinel to the Log Analytics workspace if condition is true
-            "condition": "[and(equals(parameters('enableLogAnalytics'), 'Yes'), not(empty(parameters('singlePlatformSubscriptionId'))), equals(parameters('enableSecuritySolution'), 'Yes'))]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-10-01",
-            "name": "[variables('esLiteDeploymentNames').monitoringSolutionsLiteDeploymentName]",
-            "location": "[deployment().location]",
-            "subscriptionId": "[parameters('singlePlatformSubscriptionId')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').monitoringLiteDeploymentName)]",
-                "policyCompletion"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "contentVersion": "1.0.0.0",
-                    "uri": "[variables('deploymentUris').monitoringSolutions]"
-                },
-                "parameters": {
-                    "rgName": {
-                        "value": "[variables('platformRgNames').mgmtRg]"
-                    },
-                    "workspaceName": {
-                        "value": "[variables('platformResourceNames').logAnalyticsWorkspace]"
-                    },
-                    "workspaceRegion": {
-                        "value": "[deployment().location]"
-                    },
-                    "enableSecuritySolution": {
-                        "value": "[parameters('enableSecuritySolution')]"
-                    }
-                }
-            }
-        },
-        /*
             Note: ES Lite only: deploy Log Analytics workspace policy to the platform management group
         */
         {
@@ -7631,7 +8104,7 @@
             "location": "[deployment().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').monitoringLiteDeploymentName)]",
-                "policyCompletion"
+                "alz-prerequisites"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -7847,7 +8320,7 @@
                         "value": "[parameters('enablePrivateDnsZonesSecondary')]"
                     },
                     "enableHubSecondary": {
-                        "value": "[parameters('enableHubSecondary')]"
+                        "value": "[parameters('enableSecondaryRegion')]"
                     }
                 }
             }
@@ -8698,7 +9171,7 @@
             }
         },
         /*
-            Note: ES Lite only: assign policy for identity to deny subnet without NSG 
+            Note: ES Lite only: assign policy for identity to deny subnet without NSG
         */
         {
             // Assigning deny subnet without nsg policy to identity management group if condition is true
@@ -8709,7 +9182,7 @@
             "scope": "[variables('scopes').platformManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion",
+                "alz-prerequisites",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').platformLiteSubscriptionPlacement)]"
             ],
             "properties": {
@@ -8729,7 +9202,7 @@
             }
         },
         /*
-            Note: ES Lite only: assign policy to deny management ports from internet to platform MG 
+            Note: ES Lite only: assign policy to deny management ports from internet to platform MG
         */
         {
             // Assigning deny management ports from internet policy landing zones management group if condition is true
@@ -8740,7 +9213,7 @@
             "scope": "[variables('scopes').platformManagementGroup]",
             "location": "[deployment().location]",
             "dependsOn": [
-                "policyCompletion",
+                "alz-prerequisites",
                 "[resourceId('Microsoft.Resources/deployments', variables('esLiteDeploymentNames').platformLiteSubscriptionPlacement)]"
             ],
             "properties": {
